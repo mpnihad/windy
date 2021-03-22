@@ -50,8 +50,7 @@ class SearchText {
 
         homeViewModel.getWeatherData("India")
         composeTestRule.waitUntil(timeoutMillis = 4000) { homeViewModel.isLoading.value == false }
-        composeTestRule.onNodeWithContentDescription("Edit Location").assertExists()
         composeTestRule.onNodeWithContentDescription("Edit Location").performClick()
-
+        composeTestRule.onNodeWithText("Search...").assertExists()
     }
 }
