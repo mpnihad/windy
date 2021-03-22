@@ -52,6 +52,5 @@ class SearchText {
         composeTestRule.waitUntil(timeoutMillis = 4000) { homeViewModel.isLoading.value == false }
         composeTestRule.onNodeWithContentDescription("Edit Location").performClick()
         composeTestRule.onNodeWithText("Search...").assertExists()
-
     }
 }
