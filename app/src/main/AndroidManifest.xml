@@ -18,7 +18,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AndroidDevChallenge">
+        android:theme="@style/Theme.AndroidDevChallenge"
+        android:name=".ApplicationClass">
         <activity
             android:name="com.example.androiddevchallenge.screens.homescreen.HomeActivity"
             android:label="@string/app_name"

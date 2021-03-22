@@ -13,15 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.androiddevchallenge.data.weather_data
+package com.example.androiddevchallenge.utils
 
-data class WeatherDataItem(
-    val country: String,
-    val currentTemp: Int,
-    val currentWeather: String,
-    val date: String,
-    val locality: String,
-    val nearByCity: List<NearByCity>,
-    val tempByTime: List<TempByTime>,
-    val tempInDetail: TempInDetail
-)
+const val DIALOG_TAG: String = "searchDialog"

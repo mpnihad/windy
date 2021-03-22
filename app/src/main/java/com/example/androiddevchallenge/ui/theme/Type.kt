@@ -45,7 +45,6 @@ val typography = Typography(
     */
 )
 
-
 private val appFontFamily = FontFamily(
     fonts = listOf(
 
@@ -78,7 +77,7 @@ private val appFontFamily = FontFamily(
             style = FontStyle.Normal
         ),
 
-        )
+    )
 )
 
 private val appFontFamilyWorkSans = FontFamily(
@@ -101,15 +100,14 @@ private val appFontFamilyWorkSans = FontFamily(
             style = FontStyle.Normal
         ),
 
-
-        )
+    )
 )
 
 private val defaultTypography = Typography()
 val appTypography = Typography(
-    h1 = defaultTypography.h1.copy(fontFamily = appFontFamilyWorkSans, fontSize = 72.sp,fontWeight = FontWeight.Medium, fontStyle = FontStyle.Normal),
-    h2 = defaultTypography.h2.copy(fontFamily = appFontFamilyWorkSans, fontSize = 18.sp,fontWeight = FontWeight.Bold,fontStyle = FontStyle.Normal),
-    h3 = defaultTypography.h3.copy(fontFamily = appFontFamily, fontSize = 13.sp,  fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal),
+    h1 = defaultTypography.h1.copy(fontFamily = appFontFamilyWorkSans, fontSize = 72.sp, fontWeight = FontWeight.Medium, fontStyle = FontStyle.Normal),
+    h2 = defaultTypography.h2.copy(fontFamily = appFontFamilyWorkSans, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal),
+    h3 = defaultTypography.h3.copy(fontFamily = appFontFamily, fontSize = 13.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal),
     h4 = defaultTypography.h4.copy(fontFamily = appFontFamily, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, fontStyle = FontStyle.Normal),
     h5 = defaultTypography.h5.copy(fontFamily = appFontFamilyWorkSans, fontSize = 15.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal),
     h6 = defaultTypography.h6.copy(fontFamily = appFontFamily, fontSize = 13.sp, fontWeight = FontWeight.Light, fontStyle = FontStyle.Normal),
@@ -121,6 +119,3 @@ val appTypography = Typography(
     caption = defaultTypography.caption.copy(fontFamily = appFontFamily),
     overline = defaultTypography.overline.copy(fontFamily = appFontFamily)
 )
-
-
-

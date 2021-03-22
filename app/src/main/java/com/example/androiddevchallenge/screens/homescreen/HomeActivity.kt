@@ -39,6 +39,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,6 +47,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
@@ -56,14 +58,19 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EditLocation
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -76,41 +83,44 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentManager
+import com.example.androiddevchallenge.ApplicationClass
 import com.example.androiddevchallenge.R
 import com.example.androiddevchallenge.data.weather_data.NearByCity
 import com.example.androiddevchallenge.data.weather_data.TempByTime
 import com.example.androiddevchallenge.data.weather_data.WeatherDataItem
 import com.example.androiddevchallenge.dialog.SearchDialog
 import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.utils.DIALOG_TAG
 import com.example.androiddevchallenge.utils.GetWorldBackground
 import com.example.androiddevchallenge.utils.getCloudResource
 import com.example.androiddevchallenge.utils.getTodayDate
 import com.example.androiddevchallenge.utils.tempInDegree
-import java.util.*
+import java.util.Locale
+import kotlin.math.roundToInt
 
 class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val viewModel: HomeViewModel by viewModels()
         setContent {
             MyTheme {
-                MyInitial()
-
-
+                MyInitial(viewModel)
             }
         }
     }
 
-
     @Composable
-    private fun MyInitial() {
-        val viewModel: HomeViewModel by viewModels()
+    private fun MyInitial(viewModel: HomeViewModel) {
 
         val supportFragmentManagers: FragmentManager = remember { supportFragmentManager }
         MyApp(viewModel, supportFragmentManagers)
@@ -120,11 +130,13 @@ class HomeActivity : AppCompatActivity() {
 // Start building your app here!
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun MyApp(viewModel: HomeViewModel, supportFragmentManager: FragmentManager) {
+fun MyApp(
+    viewModel: HomeViewModel,
+    supportFragmentManager: FragmentManager
+) {
     val isLoading: State<Boolean> = viewModel.isLoading.observeAsState(true)
 
     Surface(color = MaterialTheme.colors.background) {
-
 
         AnimatedVisibility(
             visible = isLoading.value,
@@ -139,7 +151,6 @@ fun MyApp(viewModel: HomeViewModel, supportFragmentManager: FragmentManager) {
         ) {
             ShowContent(viewModel, supportFragmentManager)
         }
-
     }
 }
 
@@ -157,8 +168,7 @@ fun ShowLoading() {
 
     Box(
         modifier = Modifier.fillMaxSize()
-    )
-    {
+    ) {
         Image(
             imageVector = ImageVector.vectorResource(id = R.drawable.a_3_very_sunny),
             contentDescription = "loading",
@@ -169,8 +179,6 @@ fun ShowLoading() {
                 .size(120.dp)
         )
     }
-
-
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -198,18 +206,17 @@ private fun ShowContent(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
 
-
-                TopBar(weatherData) {
+                TopBar(weatherData, viewModel) {
                     val dialog = SearchDialog()
                     dialog.show(
-                        supportFragmentManager, "searchDialog"
+                        supportFragmentManager,
+                        DIALOG_TAG
                     )
                 }
 
                 Spacer(modifier = Modifier.padding(top = 32.dp))
 
-
-                    MiddleContent(weatherData,isLoading)
+                MiddleContent(weatherData, isLoading)
                 Spacer(modifier = Modifier.padding(top = 32.dp))
                 WeatherByTime(weatherData)
                 Spacer(modifier = Modifier.padding(top = 64.dp))
@@ -223,10 +230,9 @@ private fun ShowContent(
 @Composable
 fun DetailedWeather(weatherData: WeatherDataItem, visibilityMoreCity: MutableState<Boolean>) {
 
-    Column()
-    {
+    Column() {
         Text(
-            "Near by cities",
+            stringResource(R.string.near_by_cities),
             style = MaterialTheme.typography.h3.copy(
                 color = MaterialTheme.colors.primary,
                 fontSize = 24.sp
@@ -235,12 +241,10 @@ fun DetailedWeather(weatherData: WeatherDataItem, visibilityMoreCity: MutableSta
             textAlign = TextAlign.Start
         )
         Spacer(modifier = Modifier.padding(top = 32.dp))
-        Box()
-        {
+        Box() {
             Box(
                 modifier = Modifier.align(alignment = Alignment.Center)
-            )
-            {
+            ) {
                 GetWorldBackground()
             }
             Column() {
@@ -259,23 +263,19 @@ fun DetailedWeather(weatherData: WeatherDataItem, visibilityMoreCity: MutableSta
                 AnimatedVisibility(visible = visibilityMoreCity.value) {
 
                     CityDetails(weatherData.nearByCity.subList(2, weatherData.nearByCity.size))
-
                 }
 
                 Spacer(modifier = Modifier.padding(top = 16.dp))
                 WeatherDetails(weatherData)
                 Spacer(modifier = Modifier.padding(top = 64.dp))
             }
-
         }
     }
-
 }
 
 @Composable
 fun WeatherDetails(weatherData: WeatherDataItem) {
-    Box()
-    {
+    Box() {
 
         Row(
             modifier = Modifier
@@ -285,41 +285,40 @@ fun WeatherDetails(weatherData: WeatherDataItem) {
                     BorderStroke(
                         width = 1.dp,
                         color = MaterialTheme.colors.secondary.copy(alpha = 0.1f)
-                    ), shape = RoundedCornerShape(20.dp)
+                    ),
+                    shape = RoundedCornerShape(20.dp)
                 )
                 .background(
                     color = MaterialTheme.colors.surface,
                     shape = RoundedCornerShape(20.dp)
                 )
                 .padding(top = 32.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
-        )
-        {
+        ) {
             Column(
                 modifier = Modifier.weight(1f)
-            )
-            {
+            ) {
 
-                WeatherItems("Precipitation", "${weatherData.tempInDetail.precipitation}%")
+                WeatherItems(stringResource(R.string.precipitation), stringResource(id = R.string.percentage, weatherData.tempInDetail.precipitation.toString()))
                 Spacer(modifier = Modifier.padding(top = 32.dp))
-                WeatherItems("Humidity", "${weatherData.tempInDetail.humidity}%")
-
+                WeatherItems(stringResource(R.string.humidity), stringResource(id = R.string.percentage, weatherData.tempInDetail.humidity.toString()))
             }
 
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrows),
-                contentDescription = "Divider",
+                contentDescription = stringResource(R.string.divider),
                 modifier = Modifier
                     .fillMaxHeight()
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
 
-            Column(modifier = Modifier.weight(1f))
-            {
+            Column(modifier = Modifier.weight(1f)) {
 
-                WeatherItems("Wind", "${weatherData.tempInDetail.wind} km/h")
+                WeatherItems(stringResource(R.string.wind), stringResource(id = R.string.wind_data, weatherData.tempInDetail.wind.toString()))
                 Spacer(modifier = Modifier.padding(top = 32.dp))
-                WeatherItems("Pressure", "${weatherData.tempInDetail.pressure}hPa")
-
+                WeatherItems(
+                    stringResource(R.string.pressure),
+                    stringResource(R.string.pressure_data, weatherData.tempInDetail.pressure.toString())
+                )
             }
         }
         Image(
@@ -379,8 +378,7 @@ private fun MoreCitiesButton(visibilityMoreCity: Boolean, onClick: () -> Unit) {
                 onClick()
             }
             .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
-    )
-    {
+    ) {
 
         Text(
             if (visibilityMoreCity) {
@@ -393,22 +391,19 @@ private fun MoreCitiesButton(visibilityMoreCity: Boolean, onClick: () -> Unit) {
         )
         Spacer(modifier = Modifier.padding(start = 8.dp))
 
-
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_star),
             tint = MaterialTheme.colors.primaryVariant,
             modifier = Modifier.size(25.dp),
             contentDescription = "More Cities"
         )
-
     }
 }
 
 @Composable
 fun CityDetails(weatherData: List<NearByCity>) {
 
-    Row()
-    {
+    Row() {
         repeat(weatherData.size) { position ->
             if (position < 2) {
                 val nearByCity = weatherData[position]
@@ -420,15 +415,15 @@ fun CityDetails(weatherData: List<NearByCity>) {
                             BorderStroke(
                                 width = 1.dp,
                                 color = MaterialTheme.colors.secondary.copy(alpha = 0.1f)
-                            ), shape = RoundedCornerShape(20.dp)
+                            ),
+                            shape = RoundedCornerShape(20.dp)
                         )
                         .background(
                             color = MaterialTheme.colors.surface,
                             shape = RoundedCornerShape(20.dp)
                         )
                         .padding(16.dp)
-                )
-                {
+                ) {
 
                     Text(
                         nearByCity.locality.toUpperCase(Locale.ROOT),
@@ -450,8 +445,7 @@ fun CityDetails(weatherData: List<NearByCity>) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentWidth(align = Alignment.CenterHorizontally)
-                    )
-                    {
+                    ) {
                         val annotatedString = tempInDegree(nearByCity.currentTemp.toString())
                         Text(
                             annotatedString.toAnnotatedString(),
@@ -460,49 +454,126 @@ fun CityDetails(weatherData: List<NearByCity>) {
                                 fontSize = 30.sp
                             ),
 
-                            )
+                        )
                         Spacer(modifier = Modifier.padding(start = 8.dp))
                         Text(
                             nearByCity.currentWeather.replace("_", " ").capitalize(Locale.ROOT),
                             style = MaterialTheme.typography.h4.copy(color = MaterialTheme.colors.secondary),
                             modifier = Modifier.align(alignment = Alignment.CenterVertically)
                         )
-
                     }
                 }
             }
-
         }
     }
-
-
 }
 
 @Composable
-private fun TopBar(weatherData: WeatherDataItem, OnClick: () -> Unit) {
-    Text(
-        getTodayDate(),
-        style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.secondary),
-        modifier = Modifier.padding(start = 8.dp)
-    )
+private fun TopBar(weatherData: WeatherDataItem, viewModel: HomeViewModel, OnClick: () -> Unit) {
+    Box() {
+        Column() {
+            Text(
+                getTodayDate(),
+                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.secondary),
+                modifier = Modifier.padding(start = 8.dp)
+            )
 
+            Row(
+                Modifier
 
-    Row(
-        Modifier.clickable {
-            OnClick()
+                    .clickable {
+                        OnClick()
+                    }
+                    .semantics(mergeDescendants = true) {
+                    }
+            ) {
+
+                Icon(Icons.Filled.EditLocation, contentDescription = stringResource(R.string.edit_location))
+                Text(
+                    "${weatherData.locality}, ".toUpperCase(Locale.ROOT),
+                    style = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
+                    modifier = Modifier.align(alignment = Alignment.Bottom)
+                )
+                Text(
+                    weatherData.country,
+                    style = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.secondary),
+                    modifier = Modifier.align(alignment = Alignment.Bottom)
+                )
+            }
         }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(align = Alignment.CenterEnd)
+        ) {
+            SwipeableThemeChange(viewModel)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SwipeableThemeChange(viewModel: HomeViewModel) {
+    val width = 50.dp
+    val squareSize = 25.dp
+    val isDark: Boolean by viewModel.getApplication<ApplicationClass>().isDark
+
+    val swipeableState = rememberSwipeableState(isDark)
+    if (swipeableState.currentValue) {
+        viewModel.getApplication<ApplicationClass>().toggleTheme(true)
+    } else {
+        viewModel.getApplication<ApplicationClass>().toggleTheme(false)
+    }
+    val sizePx = with(LocalDensity.current) { squareSize.toPx() }
+    val anchors = mapOf(0f to true, sizePx to false) // Maps anchor points (in px) to states
+
+    Box(
+        modifier = Modifier
+            .width(width)
+            .swipeable(
+                state = swipeableState,
+                anchors = anchors,
+                thresholds = { from, to ->
+                    FractionalThreshold(0.3f)
+                },
+
+                orientation = Orientation.Horizontal
+            )
+            .background(Color.Transparent)
+            .border(
+                BorderStroke(width = 1.dp, color = MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(50)
+            )
     ) {
 
-        Icon(Icons.Filled.EditLocation, contentDescription = "Edit Location")
-        Text(
-            "${weatherData.locality}, ".toUpperCase(Locale.ROOT),
-            style = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
-            modifier = Modifier.align(alignment = Alignment.Bottom)
+        Box(
+            Modifier
+                .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                .size(squareSize)
+                .background(MaterialTheme.colors.primaryVariant, shape = CircleShape)
         )
-        Text(
-            weatherData.country,
-            style = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.secondary),
-            modifier = Modifier.align(alignment = Alignment.Bottom)
+    }
+    Row(modifier = Modifier.width(width)) {
+        Icon(
+            imageVector = ImageVector.vectorResource(
+                id = R.drawable.a_3_very_sunny
+            ),
+            contentDescription = stringResource(R.string.weather_Icon),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            tint = MaterialTheme.colors.primary
+        )
+        Icon(
+            imageVector = ImageVector.vectorResource(
+                id = R.drawable.a_4_night
+            ),
+            contentDescription = stringResource(R.string.weather_Icon),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            tint = MaterialTheme.colors.primary
+
         )
     }
 }
@@ -510,28 +581,29 @@ private fun TopBar(weatherData: WeatherDataItem, OnClick: () -> Unit) {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun MiddleContent(weatherData: WeatherDataItem, isLoading: State<Boolean>) {
-    Box()
-    {
+    Box() {
         GetWorldBackground()
         Column() {
 
             AnimatedVisibility(
-                visible = !isLoading.value, enter =  expandIn
-                    (
-                    expandFrom= Alignment.Center,
+                visible = !isLoading.value,
+                enter = expandIn
+                (
+                    expandFrom = Alignment.Center,
                     animationSpec = tween(
                         durationMillis = 1000,
                         delayMillis = 100,
                     )
                 ),
-                exit =  shrinkOut()
+                exit = shrinkOut()
             ) {
                 Image(
                     imageVector = ImageVector.vectorResource(
                         id = getCloudResource(
                             weatherData.currentWeather
                         )
-                    ), contentDescription = "weather icon",
+                    ),
+                    contentDescription = stringResource(R.string.weather_Icon),
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(align = Alignment.CenterHorizontally)
@@ -549,12 +621,9 @@ private fun MiddleContent(weatherData: WeatherDataItem, isLoading: State<Boolean
                 style = MaterialTheme.typography.h1.copy(color = MaterialTheme.colors.primary),
                 modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
             )
-
         }
-
     }
 }
-
 
 @Composable
 private fun WeatherByTime(weatherData: WeatherDataItem) {
@@ -575,7 +644,6 @@ private fun WeatherByTime(weatherData: WeatherDataItem) {
                     modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                 )
 
-
                 Text(
                     item.time,
                     style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.primary),
@@ -583,7 +651,6 @@ private fun WeatherByTime(weatherData: WeatherDataItem) {
                 )
 
                 val annotatedString = tempInDegree(item.temp)
-
 
                 Text(
                     annotatedString.toAnnotatedString(),
@@ -600,7 +667,6 @@ private fun WeatherByTime(weatherData: WeatherDataItem) {
 fun LightPreview() {
 
     MyTheme {
-
     }
 }
 

@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.androiddevchallenge.data.weather_data
+package com.example.androiddevchallenge
 
-data class WeatherDataItem(
-    val country: String,
-    val currentTemp: Int,
-    val currentWeather: String,
-    val date: String,
-    val locality: String,
-    val nearByCity: List<NearByCity>,
-    val tempByTime: List<TempByTime>,
-    val tempInDetail: TempInDetail
-)
+import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.mutableStateOf
+
+class ApplicationClass : Application() {
+    val isDark = mutableStateOf(false)
+
+    fun toggleTheme(isDarkValue: Boolean) {
+        val theme = when (isDarkValue) {
+            true -> AppCompatDelegate.MODE_NIGHT_NO
+            false -> AppCompatDelegate.MODE_NIGHT_YES
+        }
+        AppCompatDelegate.setDefaultNightMode(theme)
+        isDark.value = isDarkValue
+    }
+}

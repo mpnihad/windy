@@ -1,3 +1,18 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.androiddevchallenge.utils
 
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,27 +27,26 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import com.example.androiddevchallenge.R
 import java.text.SimpleDateFormat
-import java.util.*
-
+import java.util.Date
+import java.util.Locale
 
 fun getTodayDate(): String {
     val sdf = SimpleDateFormat("dd, MMM yyyy", Locale.getDefault())
     return sdf.format(Date())
 }
-fun getCloudResource(weatherName: String):Int
-{
+fun getCloudResource(weatherName: String): Int {
     when (weatherName) {
         "cloudy" -> {
             return R.drawable.b_2_cloudy
         }
-"sunny" -> {
+        "sunny" -> {
             return R.drawable.a_1_sunny
         }
 
-"thunder" -> {
+        "thunder" -> {
             return R.drawable.c_3_thunderstorm
         }
-"clear" -> {
+        "clear" -> {
             return R.drawable.d_3_sleet
         }
 
@@ -116,12 +130,9 @@ fun getCloudResource(weatherName: String):Int
             return R.drawable.a_1_sunny
         }
     }
-
 }
 @Composable
-fun GetWorldBackground()
-{
-
+fun GetWorldBackground() {
 
     return Icon(
         imageVector = ImageVector.vectorResource(id = R.drawable.world),
@@ -129,13 +140,11 @@ fun GetWorldBackground()
         tint = Color.LightGray.copy(alpha = 0.2f),
         modifier = Modifier.fillMaxWidth()
 
-
     )
 }
 
-
 @Composable
- fun tempInDegree(weatherData: String): AnnotatedString.Builder {
+fun tempInDegree(weatherData: String): AnnotatedString.Builder {
 
     return AnnotatedString.Builder("$weatherData°")
         .apply {
@@ -145,6 +154,5 @@ fun GetWorldBackground()
                 ),
                 length - 1, length
             )
-
         }
 }

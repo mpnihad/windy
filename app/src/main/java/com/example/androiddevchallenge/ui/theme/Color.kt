@@ -22,8 +22,6 @@ val purple500 = Color(0xFF6200EE)
 val purple700 = Color(0xFF3700B3)
 val teal200 = Color(0xFF03DAC5)
 
-
-
 val light_primary = Color(0xFF383838)
 val light_secondary = Color(0xFF9C9C9C)
 val light_background = Color(0xFFFFFFFF)
@@ -38,4 +36,3 @@ val dark_background = Color(0xFF101014)
 val dark_surface = Color(0x752A2929)
 val dark_onSurface = Color(0x80FFFFFF)
 val dark_primaryVariant = Color(0xFFF9D65D)
-

@@ -10,4 +10,19 @@
       the License.
       -->
     <string name="app_name">AndroidDevChallenge</string>
+    <string name="searchTag">searchDialog</string>
+    <string name="near_by_cities">Near by cities</string>
+    <string name="precipitation">Precipitation</string>
+    <string name="humidity">Humidity</string>
+    <string name="divider">Divider</string>
+    <string name="wind">Wind</string>
+    <string name="wind_data">%s km/h</string>
+    <string name="percentage">%s %/h</string>
+    <string name="pressure">Pressure</string>
+    <string name="pressure_data">hPa</string>
+    <string name="edit_location">Edit Location</string>
+    <string name="weather_Icon">weather icon</string>
+    <string name="close_icon">close_icon</string>
+    <string name="search_icon">Search icon</string>
+    <string name="search_placeholder">Search...</string>
 </resources>

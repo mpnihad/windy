@@ -1,3 +1,18 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.androiddevchallenge.dialog
 
 import android.os.Bundle
@@ -31,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -41,8 +57,7 @@ import com.example.androiddevchallenge.data.weather_data.DataWeather
 import com.example.androiddevchallenge.screens.homescreen.HomeViewModel
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
-class SearchDialog() : DialogFragment() {
-
+class SearchDialog : DialogFragment() {
 
     private var title: String? = null
     private var content: String? = null
@@ -62,9 +77,8 @@ class SearchDialog() : DialogFragment() {
 
         return ComposeView(requireContext()).apply {
 
-
             setContent {
-                MyTheme() {
+                MyTheme {
                     Column(
                         modifier = Modifier.background(
                             color = Color.Transparent,
@@ -83,11 +97,10 @@ class SearchDialog() : DialogFragment() {
                                     color = MaterialTheme.colors.primary,
                                     shape = CircleShape
                                 )
-                        )
-                        {
+                        ) {
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.ic_close),
-                                "close_icon",
+                                context.getString(R.string.close_icon),
                                 tint = MaterialTheme.colors.background,
                                 modifier = Modifier.padding(4.dp)
                             )
@@ -100,22 +113,22 @@ class SearchDialog() : DialogFragment() {
                                 .background(MaterialTheme.colors.secondary.copy(alpha = 0.7f)),
                         ) {
 
-
                             val listCountryNames: MutableState<MutableList<String>> = remember {
                                 mutableStateOf(countryName)
                             }
 
-
-                            SearchBar() { searchText ->
+                            SearchBar { searchText ->
 
                                 if (searchText.text.isNotEmpty()) {
                                     listCountryNames.value = (
-                                            countryName.filter {
-                                                it.contains(searchText.text, ignoreCase = true)
-                                            }.toMutableList())
+                                        countryName.filter {
+                                            it.contains(searchText.text, ignoreCase = true)
+                                        }.toMutableList()
+                                        )
                                 } else {
                                     listCountryNames.value = (
-                                            countryName.toMutableList())
+                                        countryName.toMutableList()
+                                        )
                                 }
                             }
                             Column(
@@ -128,7 +141,7 @@ class SearchDialog() : DialogFragment() {
                                 listCountryNames.value.forEach { item ->
 
                                     Column(
-                                        modifier=Modifier.clickable {
+                                        modifier = Modifier.clickable {
                                             viewModel.getWeatherData(item)
                                             dismiss()
                                         }
@@ -147,15 +160,11 @@ class SearchDialog() : DialogFragment() {
                                     }
                                 }
                             }
-
                         }
-
                     }
                 }
-
             }
         }
-
     }
 
     @Composable
@@ -167,11 +176,9 @@ class SearchDialog() : DialogFragment() {
             onValueChange = {
                 inputvalue = it
                 onValueChanged(it)
-
-
             },
             placeholder = {
-                Text("Search...", color = MaterialTheme.colors.primary)
+                Text(stringResource(R.string.search_placeholder), color = MaterialTheme.colors.primary)
             },
 
             modifier = Modifier
@@ -181,17 +188,21 @@ class SearchDialog() : DialogFragment() {
                 .background(MaterialTheme.colors.secondary),
 
             leadingIcon = {
-                Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_search), "Search_icon")
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_search),
+                    stringResource(
+                        R.string.search_icon
+                    )
+                )
             },
             trailingIcon = {
                 if (inputvalue.text.isNotEmpty()) {
 
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_close),
-                        "close_icon"
+                        stringResource(id = R.string.close_icon)
                     )
                 }
-
             },
 
             colors = TextFieldDefaults.textFieldColors(
@@ -201,9 +212,7 @@ class SearchDialog() : DialogFragment() {
             )
 
         )
-
     }
-
 
     override fun onStart() {
         val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
@@ -212,13 +221,4 @@ class SearchDialog() : DialogFragment() {
 
         super.onStart()
     }
-
-    fun setText(title: String, content: String, buttonString: String) {
-        this.title = title
-        this.content = content
-        this.button = buttonString
-
-    }
-
-
 }

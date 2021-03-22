@@ -15,8 +15,14 @@
  */
 package com.example.androiddevchallenge
 
+import androidx.activity.viewModels
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.androiddevchallenge.screens.homescreen.HomeActivity
+import com.example.androiddevchallenge.screens.homescreen.HomeViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,12 +33,24 @@ import org.junit.runner.RunWith
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
+class SearchText {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
+    val composeTestRule = createAndroidComposeRule<HomeActivity>()
 
     @Test
-    fun sampleTest() {
-        // Add instrumented tests here
+    fun initialTest() {
+
+        composeTestRule.onNodeWithContentDescription("loading").assertExists()
+    }
+
+    @Test
+    fun checkSearch() {
+
+        val homeViewModel: HomeViewModel by composeTestRule.activity.viewModels()
+
+        homeViewModel.getWeatherData("India")
+        composeTestRule.waitUntil(timeoutMillis = 4000) { homeViewModel.isLoading.value == false }
+        composeTestRule.onNodeWithContentDescription("Edit Location").performClick()
+        composeTestRule.onNodeWithText("Search...").assertExists()
     }
 }
