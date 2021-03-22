@@ -9,7 +9,7 @@
       or implied. See the License for the specific language governing permissions and limitations under
       the License.
       -->
-    <string name="app_name">AndroidDevChallenge</string>
+    <string name="app_name">Windy</string>
     <string name="searchTag">searchDialog</string>
     <string name="near_by_cities">Near by cities</string>
     <string name="precipitation">Precipitation</string>
@@ -17,7 +17,7 @@
     <string name="divider">Divider</string>
     <string name="wind">Wind</string>
     <string name="wind_data">%s km/h</string>
-    <string name="percentage">%s %/h</string>
+    <string name="percentage">%s \%%</string>
     <string name="pressure">Pressure</string>
     <string name="pressure_data">hPa</string>
     <string name="edit_location">Edit Location</string>
